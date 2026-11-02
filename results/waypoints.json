@@ -1,0 +1,36 @@
+{
+ "学習段階 2（最終）": {
+  "元の経路": {
+   "passed": 8,
+   "total": 8,
+   "seconds": 34.8
+  },
+  "左右反転": {
+   "passed": 8,
+   "total": 8,
+   "seconds": 34.6
+  },
+  "大きく蛇行": {
+   "passed": 6,
+   "total": 6,
+   "seconds": 28.7
+  }
+ },
+ "学習段階 1（模倣のみ）": {
+  "元の経路": {
+   "passed": 1,
+   "total": 8,
+   "seconds": 45.0
+  },
+  "左右反転": {
+   "passed": 0,
+   "total": 8,
+   "seconds": 45.0
+  },
+  "大きく蛇行": {
+   "passed": 0,
+   "total": 6,
+   "seconds": 45.0
+  }
+ }
+}

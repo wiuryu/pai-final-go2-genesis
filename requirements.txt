@@ -1,0 +1,5 @@
+genesis-world
+torch
+numpy
+matplotlib
+# 動画の書き出しには ffmpeg（コマンド）が必要
