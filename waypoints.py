@@ -12,8 +12,21 @@ import genesis as gs
 
 import walker as W
 
-# 経路上の点（出発点からの x, y [m]）。x 方向に 2 m ずつ進みながら、左右にゆるやかに曲がる
-WAYPOINTS = [(2, 0.6), (4, 1.2), (6, 0.6), (8, -0.4), (10, -1.2), (12, -0.6), (14, 0.4), (16, 1.0)]
+def random_waypoints(seed, count=8):
+    """出発点からの x, y [m]。x は 1.8〜2.6 m ずつ進み、y は左右にランダムに振る（隣の点との差は 1.8 m 以内）。"""
+    rng = np.random.default_rng(seed)
+    points = []
+    x, y = 0.0, 0.0
+    for _ in range(count):
+        x += rng.uniform(1.8, 2.6)
+        y = float(np.clip(y + rng.uniform(-1.8, 1.8), -1.6, 1.6))
+        points.append((round(x, 2), round(y, 2)))
+    return points
+
+
+# 動画で使う経路の乱数 seed
+VIDEO_SEED = 3
+WAYPOINTS = random_waypoints(VIDEO_SEED)
 REACH_RADIUS = 0.4    # 点からこの距離以内に入ったら通過とみなす [m]
 MAX_TURN = 0.6        # GRU に見せるヨーのずれの上限 [rad]。学習時の初期ヨーの範囲に合わせる
 T_MAX = 45.0          # 最大の時間 [s]
@@ -78,11 +91,8 @@ def follow_waypoints(scene, robot, net, origin, waypoints, on_step=None, index=0
 
 
 # 評価に使う経路。出発点からの (x, y) [m]
-PATHS = {
-    "元の経路": WAYPOINTS,
-    "左右反転": [(x, -y) for x, y in WAYPOINTS],
-    "大きく蛇行": [(2, 1.0), (4, -0.2), (6, 1.0), (8, -0.2), (10, 1.0), (12, -0.2)],
-}
+PATHS = {f"ランダム seed {seed}": random_waypoints(seed) for seed in range(6)}
+PATHS["大きく蛇行"] = [(2, 1.0), (4, -0.2), (6, 1.0), (8, -0.2), (10, 1.0), (12, -0.2)]
 
 
 def main():

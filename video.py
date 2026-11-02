@@ -150,6 +150,13 @@ def write_frame(fig, encoder, repeat=1):
         encoder.stdin.write(data)
 
 
+def hold_repeat(i, n_frames):
+    """最初と最後の画面は HOLD_SECONDS 秒止める。"""
+    if i == 0 or i == n_frames - 1:
+        return HOLD_SECONDS * FPS
+    return 1
+
+
 def frame_to_step(frame_index):
     return min(FRAME_EVERY * frame_index, W.T_EP - 1)
 
@@ -410,12 +417,13 @@ def write_three_tiles(encoder, view_frames, yaw_deg, heading):
         ax.set_title(title, fontsize=SUBHEADING_SIZE)
         captions.append(fig.text(rect[0] + rect[2] / 2, rect[1] - 0.045, "", ha="center", fontsize=15))
 
-    for i in range(len(view_frames[0])):
+    n_frames = len(view_frames[0])
+    for i in range(n_frames):
         step = min(FRAME_EVERY * i, n_steps - 1)
         for v, (image, caption) in enumerate(zip(images, captions)):
             image.set_data(view_frames[v][i])
             caption.set_text(f"t = {step * W.DT:4.2f} s　ヨー {yaw_deg[step, v]:+5.1f}°")
-        write_frame(fig, encoder, repeat=HOLD_SECONDS * FPS if i == 0 else 1)
+        write_frame(fig, encoder, repeat=hold_repeat(i, n_frames))
     plt.close(fig)
 
 
@@ -441,14 +449,15 @@ def write_before_after(encoder, frames_before, frames_after, yaw_deg, pos, yaw0)
     ]
     time_lines = add_graph_panels(fig, t, panels, rects=RIGHT_COLUMN)
 
-    for i in range(len(frames_before)):
+    n_frames = len(frames_before)
+    for i in range(n_frames):
         step = frame_to_step(i)
         for (image, caption), frame, column in ((top, frames_before[i], 0), (bottom, frames_after[i], 1)):
             image.set_data(frame)
             caption.set_text(f"t = {t[step]:4.2f} s　ヨー {yaw_deg[step, column]:+5.1f}°")
         for line in time_lines:
             line.set_xdata([t[step], t[step]])
-        write_frame(fig, encoder, repeat=HOLD_SECONDS * FPS if i == 0 else 1)
+        write_frame(fig, encoder, repeat=hold_repeat(i, n_frames))
     plt.close(fig)
 
 
@@ -493,7 +502,7 @@ def write_waypoint_task(encoder, frames, record, targets, passed):
         robot_dot.set_data([track[-1, 0]], [track[-1, 1]])
         image.set_data(frames[i])
         caption.set_text(f"t = {t:4.1f} s　通過した点 {n_passed} / {len(targets)}")
-        write_frame(fig, encoder, repeat=HOLD_SECONDS * FPS if i == 0 else 1)
+        write_frame(fig, encoder, repeat=hold_repeat(i, n_frames))
     plt.close(fig)
 
 
